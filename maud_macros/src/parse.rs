@@ -522,7 +522,19 @@ impl Parser {
                     s.push_str(term.as_str());
                     false
                 },
-                _ => break,
+                Some(TokenTree { kind: TokenNode::Literal(ref literal), .. }) => {
+                    let litstr = literal.to_string();
+
+                    // Only accept integers
+                    if litstr.starts_with(|c: char| c.is_digit(10)) && !litstr.contains('.') {
+                        self.advance();
+                        s.push_str(&litstr);
+                        true
+                    } else {
+                        break
+                    }
+                }
+                _ => break
             };
         }
         Ok(s)
